@@ -1,0 +1,35 @@
+# Python関連
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+
+# 環境設定ファイル
+.env
+.envrc
+
+# AWS SAM関連
+.aws-sam/
+
+# ログファイル
+*.log
+response.json
+
+# IDE関連
+.vscode/
+.idea/
+*.swp
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# その他
+*.bak
+*.tmp

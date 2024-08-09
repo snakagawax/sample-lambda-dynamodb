@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+  SAM Template for DynamoDB to SNS Lambda Function
+
+Resources:
+  ServiceTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: 'ServiceTable'
+      AttributeDefinitions:
+        - AttributeName: 'serviceName'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'serviceName'
+          KeyType: 'HASH'
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+
+  ServiceTopicA:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: 'ServiceTopicA'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+
+  ServiceTopicB:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: 'ServiceTopicB'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'LambdaDynamoDBSNSPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'dynamodb:GetItem'
+                  - 'sns:Publish'
+                Resource: '*'
+
+  DynamoDBToSNSFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: 'sam-app-DynamoDBToSNSFunction'
+      Handler: 'app.handler'
+      Runtime: 'python3.8'
+      CodeUri: './src'
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ServiceTable
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        ApiEvent:
+          Type: 'Api'
+          Properties:
+            Path: '/send'
+            Method: 'post'
+
+Outputs:
+  ServiceTableName:
+    Description: 'DynamoDB Table Name'
+    Value: !Ref ServiceTable
+
+  ServiceTopicArnA:
+    Description: 'SNS Topic ARN'
+    Value: !Ref ServiceTopicA
+
+  ServiceTopicArnB:
+    Description: 'SNS Topic ARN'
+    Value: !Ref ServiceTopicB
+
+  LambdaFunctionName:
+    Description: 'Lambda Function Name'
+    Value: !Ref DynamoDBToSNSFunction
