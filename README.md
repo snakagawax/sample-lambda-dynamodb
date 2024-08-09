@@ -1,13 +1,14 @@
 # AWS SAM DynamoDB to SNS Lambda Function
 
-このプロジェクトは、AWS SAM を使用して DynamoDB テーブルから SNS トピックにメッセージを送信する Lambda 関数をデプロイするためのものです。
+このプロジェクトは、AWS SAM を使用して DynamoDB テーブルから SNS トピックにメッセージを送信する Lambda 関数のサンプルです。
+
+![構成](images/image.png)
 
 ## 前提条件
 
 - AWS CLI がインストールされていること
 - AWS CLI が設定されていること (`aws configure`を実行)
 - AWS SAM CLI がインストールされていること
-    - 
 
 ## プロジェクトのセットアップ
 
