@@ -103,7 +103,7 @@ AWS マネジメントコンソールを使用して Lambda 関数をテスト�
 ```sh
 aws lambda invoke \
     --invocation-type RequestResponse \
-    --function-name sam-app-DynamoDBToSNSFunction-kXGTH4XZcnN3 \
+    --function-name sam-app-DynamoDBToSNSFunction \
     --region ap-northeast-1 \
     --log-type Tail \
     --payload fileb://event.json \
