@@ -34,7 +34,7 @@ sam deploy --guided
 プロンプトに従って、スタック名、リージョン、その他の設定を入力します。以下は例です：
 
 ```plaintext
-Stack Name [sam-app]: MyDynamoDBToSNSStack
+Stack Name [sam-app]: 
 AWS Region [ap-northeast-1]: us-west-2
 Confirm changes before deploy [y/N]: Y
 Allow SAM CLI IAM role creation [Y/n]: Y
@@ -47,19 +47,31 @@ SAM configuration environment [default]: default
 
 ## SNSサブスクリプションの追加
 
-### 1. SNSトピックへのEmailサブスクリプション
+### 1. 環境変数を設定
+
+```sh
+AWS_ACCOUNT=`aws sts get-caller-identity --query Account --output text`
+MAIL_ADDRESS_1=foo@example.com
+MAIL_ADDRESS_2=bar@example.com
+```
+
+### 2. SNSトピックへのEmailサブスクリプション
 
 ```sh
 aws sns subscribe \
-    --topic-arn arn:aws:sns:ap-northeast-1:123456789012:ServiceTopicA \
+    --topic-arn arn:aws:sns:ap-northeast-1:${AWS_ACCOUNT}:ServiceTopicA \
     --protocol email \
-    --notification-endpoint your-email@example.com
+    --notification-endpoint ${MAIL_ADDRESS_1}
 
 aws sns subscribe \
-    --topic-arn arn:aws:sns:ap-northeast-1:123456789012:ServiceTopicB \
+    --topic-arn arn:aws:sns:ap-northeast-1:${AWS_ACCOUNT}:ServiceTopicB \
     --protocol email \
-    --notification-endpoint your-email@example.com
+    --notification-endpoint ${MAIL_ADDRESS_2}
 ```
+
+### 3. サプスクライブする
+
+メールが届くので[Confirm subscription]をクリックする。
 
 ## DynamoDBテーブルへのデータ登録
 
@@ -68,37 +80,22 @@ aws sns subscribe \
 ```sh
 aws dynamodb put-item \
     --table-name ServiceTable \
-    --item '{
-        "serviceName": {"S": "ProjectA"},
-        "snsTopicArn": {"S": "arn:aws:sns:ap-northeast-1:123456789012:ServiceTopicA"}
-    }'
+    --item "{
+        \"serviceName\": {\"S\": \"ProjectA\"},
+        \"snsTopicArn\": {\"S\": \"arn:aws:sns:ap-northeast-1:${AWS_ACCOUNT}:ServiceTopicA\"}
+    }"
 
 aws dynamodb put-item \
     --table-name ServiceTable \
-    --item '{
-        "serviceName": {"S": "ProjectB"},
-        "snsTopicArn": {"S": "arn:aws:sns:ap-northeast-1:123456789012:ServiceTopicB"}
-    }'
+    --item "{
+        \"serviceName\": {\"S\": \"ProjectB\"},
+        \"snsTopicArn\": {\"S\": \"arn:aws:sns:ap-northeast-1:${AWS_ACCOUNT}:ServiceTopicB\"}
+    }"
 ```
 
 ## テストの実行
 
-### 1. テストイベントの作成
-
-以下のような JSON 形式のテストイベントを作成します。
-
-```json
-{
-    "service": "ProjectA",
-    "message": "This is a test message for ProjectA"
-}
-```
-
-### 2. Lambda関数のテスト実行
-
-AWS マネジメントコンソールを使用して Lambda 関数をテストするか、AWS CLI を使用してテストを実行します。
-
-#### AWS CLIを使用したテスト
+#### 1. AWS CLIを使用したテスト
 
 ```sh
 aws lambda invoke \
@@ -117,5 +114,5 @@ aws lambda invoke \
 リソースを削除する場合は、以下のコマンドを実行してスタックを削除します。
 
 ```sh
-sam delete --stack-name MyDynamoDBToSNSStack
+sam delete
 ```

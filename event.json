@@ -1,4 +1,3 @@
 {
-    "service": "ProjectA",
-    "message": "This is a test message for ProjectA"
+    "body": "{\"service\": \"ProjectA\", \"message\": \"This is a test message for ProjectA\"}"
 }
