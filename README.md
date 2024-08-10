@@ -35,7 +35,7 @@ sam deploy --guided
 
 ```plaintext
 Stack Name [sam-app]: 
-AWS Region [ap-northeast-1]: us-west-2
+AWS Region [ap-northeast-1]: ap-northeast-1
 Confirm changes before deploy [y/N]: Y
 Allow SAM CLI IAM role creation [Y/n]: Y
 Disable rollback [y/N]: N
